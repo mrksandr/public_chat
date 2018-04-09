@@ -1,0 +1,81 @@
+box: node
+
+build:
+  steps:
+    - script:
+        name: echo nodejs information
+        code: |
+          echo "node version $(node -v) running"
+          echo "npm version $(npm -v) running"
+          echo $WERCKER_GIT_COMMIT
+    - npm-install
+
+    # run tests
+    #- npm-test
+
+deploy:
+  steps:
+    - heroku-deploy:
+        key: $HEROKU_KEY
+        key-name: DEPLOY_KEY
+        user: $HEROKU_USER
+        app-name: $HEROKU_APP_NAME
+    - script:
+        name: install client
+        code: npm install --prefix src/client
+    - script:
+        name: install pm2
+        code: npm install pm2 -g
+    - script:
+        name: copy
+        code: cp -R /pipeline/source/. /public_chat
+    - internal/docker-push:
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
+        cmd: npm start
+        repository: $DOCKER_REPO
+        registry: https://hub.docker.com
+        ports: "8000, 3000"
+        working-dir: /public_chat
+
+deploy-do:
+  steps:
+    - script:
+        name: install client
+        code: npm install --prefix src/client
+    - script:
+        name: install pm2
+        code: npm install pm2 -g
+    - script:
+        name: copy
+        code: cp -R /pipeline/source/. /public_chat
+    - internal/docker-push:
+        username: $DOCKER_USERNAME
+        password: $DOCKER_PASSWORD
+        cmd: npm start
+        repository: $DOCKER_REPO
+        registry: https://hub.docker.com
+        ports: "8000, 3000"
+        working-dir: /public_chat
+    - add-ssh-key:
+        keyname: DIGITAL_OCEAN
+    - add-to-known_hosts:
+        hostname: $SERVER_IP
+    - script:
+        name: pull latest image
+        code: ssh root@$SERVER_IP docker pull $DOCKER_REPO:latest
+    - script:
+        name: stop running container
+        code: ssh root@$SERVER_IP docker stop $APPLICATION_NAME || echo ‘failed to stop running container’
+    - script:
+        name: remove stopped container
+        code: ssh root@$SERVER_IP docker rm $APPLICATION_NAME || echo ‘failed to remove stopped container’
+    - script:
+        name: remove image behind stopped container
+        code: ssh root@$SERVER_IP> docker rmi $DOCKER_REPO:current || echo ‘failed to remove image behind stopped container’
+    - script:
+        name: tag newly pulled image
+        code: ssh root@$SERVER_IP docker tag $DOCKER_REPO:latest $DOCKER_REPO:current || echo ‘failed to change tag’
+    - script:
+        name: run new container
+        code: ssh root@$SERVER_IP docker run -d -p 80:$NODE_PORT --name $APPLICATION_NAME $DOCKER_REPO:current

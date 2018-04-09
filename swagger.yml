@@ -1,0 +1,140 @@
+swagger: "2.0"
+
+info:
+  version: "0.0.1"
+  title: Public Chat API
+  description: This specification is for Public Chat API |
+               These specifications is use to help developers during development
+  contact:
+    name: Oleksandr Petrichkovich
+    url: https://public-chatik.herokuapp.com/
+    email: alex.petrichkovich@gmail.com
+    
+  license:
+    name: MIT
+
+# during dev, should point to your local machine
+host: localhost:8000
+# basePath prefixes all resource paths- Version 1.0
+basePath: /api/v1/
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+# Tags for API
+tags:
+  - name: posts
+    description: Refer to messages that are send from chat
+
+# This is where the resource paths are defined
+paths:
+  # Posts API
+  /posts:
+    get:
+      summary: Get all posts
+      description: Returns all messages from server
+      security:
+        - KeySecurity : []
+        
+      tags:
+        - posts
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Posts"
+
+        "400":
+          description: When can't get messages 
+          schema:
+            $ref: "#/definitions/ApiResponse"
+            
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ApiResponse"
+    post:
+      summary: Create post
+      description: For valid response check that text is less than 200 symbols and username contains only letters and numbers
+      security:
+        - KeySecurity : []
+      # Refer to the tags created earlier
+      tags:
+        - posts
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Message object that needs to be created"
+          required: true
+          schema:
+            $ref: "#/definitions/Post"
+      responses:
+        "201":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Post"
+
+        "400":
+          description: When message is NOT created
+          schema:
+            $ref: "#/definitions/ApiResponse"
+            
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ApiResponse"
+          
+# definitions + parameters + securityDefinitions
+definitions:
+  ApiResponse:
+    type: object
+    required:
+      - success
+      - message
+    properties:
+      success:
+        type: boolean
+        example: false
+      message:
+        type: object
+      error:
+        type: object
+        
+  # Message collection
+  Posts:
+    type: array
+    items: 
+      $ref: "#/definitions/Post"
+      
+  Post:
+    required:
+      - username
+      - text
+    properties:
+      # Name of the package
+      username:
+        type: string
+        example: "Vasya"
+        
+      # Description of the package
+      text:
+        type: string
+        maxLength: 200
+        example: "Hi, Vasya"
+      
+# Security Definitions
+securityDefinitions:
+  KeySecurity:
+    type: apiKey
+    in: query
+    name: api_key
