@@ -32,15 +32,17 @@ models.sequelize
     console.error('There is connection in ERROR:', config.db_name, err);
   });
 
-if (env === 'development') {
-  models.sequelize.sync();
-  // models.sequelize.sync({ force: true }); // for test
-}
+// if (env === 'development') {
+models.sequelize.sync();
+// models.sequelize.sync({ force: true }); // for test
+// }
 
 app.use('/api/v1', routes);
 
-const swaggerDocument = YAML.load('./swagger.yml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+if (env === 'development') {
+  const swaggerDocument = YAML.load('./swagger.yml');
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+}
 
 app.use('/api/*', (req, res, next) => {
   const err = new Error('Not found');
