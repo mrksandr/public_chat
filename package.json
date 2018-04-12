@@ -10,12 +10,12 @@
   "scripts": {
     "preinstall": "npm i -g pm2",
     "start": "pm2 start proccess.yml --env production --no-daemon",
-    "server": "nodemon -w src --exec \"babel-node src --presets es2015,stage-0\"",
+    "server": "nodemon --watch -w src --exec \"babel-node src --presets es2015,stage-0\"",
     "client": "npm run start --prefix src/client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "babel src -s -D -d build --presets es2015,stage-0 --ignore src/client",
     "prestart": "npm run -s build && npm run build --prefix src/client",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix src/client && npm run build --prefix src/client",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix src/client && npm run prestart",
     "lint": "eslint src",
     "test": "jest src/test",
     "coverage": "jest --collectCoverageFrom=src/**.js --collectCoverageFrom=!src/index.js --coverage src"
@@ -52,6 +52,7 @@
     "concurrently": "^3.5.1",
     "dotenv": "^5.0.1",
     "express": "^4.14.0",
+    "moment": "^2.22.0",
     "path": "^0.12.7",
     "sequelize": "^4.37.5",
     "socket.io": "^2.1.0",

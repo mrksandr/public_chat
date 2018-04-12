@@ -11,6 +11,8 @@ module.exports.getAllPosts = async (req, res) => {
 };
 
 export const createPost = async (req, res, next) => {
+  console.log(req.body);
+  // resSuccess(res, {}, 201);
   try {
     const post = await models.Post.create({
       username: req.body.username,

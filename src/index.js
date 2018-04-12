@@ -78,7 +78,7 @@ if (env === 'production') {
   });
 }
 
-server.listen(config.port, err => {
+app.server = server.listen(config.port, err => {
   if (err) {
     console.log(err);
   }

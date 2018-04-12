@@ -13,6 +13,7 @@ export default (sequelize, DataTypes) => {
           },
           notEmpty: { args: true, msg: 'Username cannot be empty' },
         },
+        defaultValue: '',
       },
       text: {
         type: Sequilize.STRING(200),
@@ -23,6 +24,7 @@ export default (sequelize, DataTypes) => {
           },
           notEmpty: { args: true, msg: 'Text cannot be empty' },
         },
+        defaultValue: '',
       },
     },
     {
