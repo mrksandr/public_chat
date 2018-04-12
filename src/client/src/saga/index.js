@@ -55,7 +55,7 @@ const postMessagesApi = message =>
     });
 
 function connect() {
-  const socket = io('http://localhost:8000');
+  const socket = io();
   return new Promise(resolve => {
     socket.on('connect', () => {
       resolve(socket);
