@@ -34,7 +34,7 @@ deploy:
         password: $DOCKER_PASSWORD
         cmd: npm start
         repository: $DOCKER_REPO
-        registry: https://hub.docker.com
+        registry: "" #https://hub.docker.com
         ports: "8000, 3000"
         working-dir: /public_chat
 
