@@ -44,7 +44,7 @@ export default io => {
     socket.on('message', payload => {
       console.log(`[server] message: ${payload.text}`);
       const user = users.getUser(socket.id);
-      const message = generateMessage(user.username, payload.text);
+      const message = generateMessage(payload);
       io.emit('messages.new', { message }); // admin
     });
   });

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { fetchMessagesRequest } from '../../AC';
+import { messageListSelector } from '../../selector';
 
 class Messages extends Component {
   componentDidMount() {
+    this.props.fetchMessagesRequest();
     this.scrollDown();
   }
 
@@ -10,7 +14,9 @@ class Messages extends Component {
   }
 
   render() {
-    const { messages } = this.props;
+    const { messages, loading, error } = this.props;
+    if (loading) return <div>loading...</div>;
+    if (error && error.load) return <div>{error.load}</div>;
 
     return (
       <div ref="container" className="sidebar-sticky message-block">
@@ -23,10 +29,12 @@ class Messages extends Component {
     );
   }
 
-  scrollDown() {
+  scrollDown = () => {
     const { container } = this.refs;
-    container.scrollTop = container.scrollHeight;
-  }
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  };
 
   getMessages = () => {
     const { messages } = this.props;
@@ -54,4 +62,10 @@ class Messages extends Component {
   };
 }
 
-export default Messages;
+const mapStateToProps = state => ({
+  messages: messageListSelector(state),
+  error: state.messages.errors,
+  loading: state.messages.loading,
+});
+
+export default connect(mapStateToProps, { fetchMessagesRequest })(Messages);

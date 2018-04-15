@@ -45,7 +45,7 @@ class SignInForm extends React.Component {
     if (isValid) {
       const { username } = this.state;
 
-      this.props.handleSignIn(this.state.username);
+      this.props.handleSignIn(username);
       this.setState({
         username: '',
         errors: {},

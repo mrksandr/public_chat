@@ -3,7 +3,6 @@ export const SIGN_OUT = 'SIGN_OUT';
 export const ADD_USER = 'ADD_USER';
 export const REMOVE_USER = 'REMOVE_USER';
 export const FETCH_USERS = 'FETCH_USERS';
-
 export const NEW_MESSAGE = 'NEW_MESSAGE';
 export const SEND_MESSAGE = 'SEND_MESSAGE';
 export const FETCH_MESSAGES = 'FETCH_MESSAGES';
@@ -41,7 +40,6 @@ export function addUser({ user }) {
 }
 
 export function removeUser({ user }) {
-  console.log('remove_user AC', user);
   return {
     type: REMOVE_USER,
     payload: { user },
@@ -56,8 +54,8 @@ export function newMessage(message) {
 }
 export function sendMessage(message) {
   return {
-    type: SEND_MESSAGE,
-    payload: message,
+    type: SEND_MESSAGE + REQUEST,
+    payload: { message },
   };
 }
 

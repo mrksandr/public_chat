@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { sendMessage } from '../../AC';
+import { authSelector } from '../../selector';
 
 class SendForm extends Component {
   state = {
@@ -6,15 +9,21 @@ class SendForm extends Component {
     errors: {},
   };
 
-  render() {
-    const { messages } = this.props;
+  componentWillReceiveProps(nextProps) {
+    nextProps.errors && this.setState({ errors: nextProps.errors });
+  }
 
+  render() {
     return (
       <form className="card p-2 row m-10" onSubmit={this.handleSend}>
         <div className="input-group">
+          {this.state.errors.text && (
+            <label className="error">{this.state.errors.text}</label>
+          )}
           <input
             type="text"
             name="text"
+            autoComplete="off"
             className={
               this.state.errors.text ? 'form-control has-error' : 'form-control'
             }
@@ -29,7 +38,6 @@ class SendForm extends Component {
             </button>
           </div>
         </div>
-        <span>{this.state.errors.text}</span>
       </form>
     );
   }
@@ -56,6 +64,7 @@ class SendForm extends Component {
     if (this.state.text && this.state.text.length > 200)
       errors.text = "Message can't be more than 200 letters";
     if (this.state.text === '') errors.text = "Can't be empty";
+
     this.setState({ errors });
     const isValid = Object.keys(errors).length === 0;
 
@@ -71,4 +80,9 @@ class SendForm extends Component {
   };
 }
 
-export default SendForm;
+const mapStateToProps = state => ({
+  username: authSelector(state),
+  errors: state.messages.errors,
+});
+
+export default connect(mapStateToProps, { sendMessage })(SendForm);

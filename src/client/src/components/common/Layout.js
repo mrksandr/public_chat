@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 const Layout = props => (
   <div className="main-container">
@@ -7,13 +7,17 @@ const Layout = props => (
         <div className="collapse navbar-collapse">
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
-              <a className="nav-link" href="#">
+              <a className="nav-link" href="javascript:void(0);">
                 Chat App <span className="sr-only">(current)</span>
               </a>
             </li>
           </ul>
           <div className="navbar-nav mt-2 mt-md-0">
-            <a className="nav-link" href="#" onClick={props.signOut}>
+            <a
+              className="nav-link"
+              href="javascript:void(0);"
+              onClick={props.signOut}
+            >
               Выйти
             </a>
           </div>

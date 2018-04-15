@@ -1,7 +1,7 @@
 import models from '../models';
 import { resSuccess, resError } from '../utils';
 
-module.exports.getAllPosts = async (req, res) => {
+export const getAllPosts = async (req, res) => {
   try {
     const posts = await models.Post.findAll();
     resSuccess(res, { posts });
@@ -11,8 +11,6 @@ module.exports.getAllPosts = async (req, res) => {
 };
 
 export const createPost = async (req, res, next) => {
-  console.log(req.body);
-  // resSuccess(res, {}, 201);
   try {
     const post = await models.Post.create({
       username: req.body.username,

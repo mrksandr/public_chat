@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import axios from 'axios';
-import { eventChannel, delay } from 'redux-saga';
+import { eventChannel } from 'redux-saga';
 import {
   fork,
   take,
@@ -14,9 +14,6 @@ import { push } from 'react-router-redux';
 import {
   SIGN_IN,
   SIGN_OUT,
-  ADD_USER,
-  REMOVE_USER,
-  NEW_MESSAGE,
   SEND_MESSAGE,
   FETCH_MESSAGES,
   REQUEST,
@@ -29,9 +26,8 @@ import {
   addUser,
   removeUser,
   newMessage,
-  sendMessage,
   fetchUsers,
-  fetchMessagesRequest,
+  // fetchMessagesRequest,
 } from '../AC';
 
 const fetchMessagesApi = () =>
@@ -59,7 +55,6 @@ function connect() {
   return new Promise(resolve => {
     socket.on('connect', () => {
       resolve(socket);
-      console.log('connect');
     });
   });
 }
@@ -75,7 +70,6 @@ function subscribe(socket) {
     });
 
     socket.on('users.fetch', ({ users }) => {
-      console.log('users.fetch', users);
       emit(fetchUsers({ users }));
     });
 
@@ -96,7 +90,6 @@ function* read(socket) {
   }
 
   while (true) {
-    console.log(action, '------------------------------');
     let action = yield take(channel);
     yield put(action);
   }
@@ -104,8 +97,9 @@ function* read(socket) {
 
 function* write(socket) {
   while (true) {
-    const { payload } = yield take('SEND_MESSAGE');
-    socket.emit('message', payload);
+    const action = yield take(SEND_MESSAGE + SUCCESS);
+    const { message } = action.payload;
+    socket.emit('message', message);
   }
 }
 
@@ -116,25 +110,18 @@ function* handleIO(socket) {
 
 function* flow() {
   while (true) {
-    let { payload } = yield take('SIGN_IN');
+    let { payload } = yield take(SIGN_IN);
 
     const socket = yield call(connect);
     socket.emit('login', { username: payload.username }, err => {
       if (err) alert(err);
     });
-    console.log('fetchmessage');
-    yield put(fetchMessagesRequest());
-    /*
-    yield put({
-      action: FETCH_MESSAGES,
-
-    });*/
 
     yield put(push('/chat/'));
 
     const task = yield fork(handleIO, socket);
 
-    let action = yield take('SIGN_OUT');
+    yield take(SIGN_OUT);
 
     yield cancel(task);
 
@@ -156,29 +143,31 @@ function* fetchMessagesSaga() {
       payload: { messages },
     });
   } catch (err) {
+    console.log(err.message);
     yield put({
       type: FETCH_MESSAGES + FAIL,
-      error: err.message,
+      error: { load: err.message },
     });
   }
 }
 
 function* postmessageSaga(action) {
+  const { message } = action.payload;
   yield put({
-    type: NEW_MESSAGE + START,
+    type: SEND_MESSAGE + START,
   });
 
   try {
-    const message = yield call(postMessagesApi, { ...action.payload.message });
+    const requestMessage = yield call(postMessagesApi, message);
 
     yield put({
-      type: NEW_MESSAGE + SUCCESS,
-      payload: { message },
+      type: SEND_MESSAGE + SUCCESS,
+      payload: { message: requestMessage },
     });
   } catch (err) {
     yield put({
-      type: NEW_MESSAGE + FAIL,
-      error: err.message,
+      type: SEND_MESSAGE + FAIL,
+      error: err.response.data.message,
     });
   }
 }
@@ -186,5 +175,5 @@ function* postmessageSaga(action) {
 export default function* rootSaga() {
   yield fork(flow);
   yield all([takeLatest(FETCH_MESSAGES + REQUEST, fetchMessagesSaga)]);
-  yield all([takeLatest(NEW_MESSAGE, postmessageSaga)]);
+  yield all([takeLatest(SEND_MESSAGE + REQUEST, postmessageSaga)]);
 }

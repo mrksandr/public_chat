@@ -1,16 +1,6 @@
 import moment from 'moment';
 
-export const generateMessage = (username, text) => {
-  const d = new Date();
-  return {
-    id: moment().valueOf(),
-    username,
-    text,
-    createdAt: moment().toISOString(),
-  };
-};
-
-class Users {
+export default class Users {
   constructor() {
     this.users = [];
   }
@@ -35,4 +25,12 @@ class Users {
     return this.users;
   }
 }
-export default Users;
+
+export const generateMessage = message => {
+  return {
+    id: message.id || moment().valueOf(),
+    username: message.username,
+    text: message.text,
+    createdAt: message.createdAt || moment().toISOString(),
+  };
+};
