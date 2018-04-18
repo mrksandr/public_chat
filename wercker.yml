@@ -21,11 +21,24 @@ deploy:
         user: $HEROKU_USER
         app-name: $HEROKU_APP_NAME
     - script:
-        name: install client
-        code: npm install --prefix src/client
-    - script:
         name: install pm2
         code: npm install pm2 -g
+        
+    - script:
+        name: install babel
+        code: npm install babel-cli -g
+        
+    - script:
+        name: install
+        code: npm install
+        
+    - script: 
+        name: build
+        code: babel src -s -D -d build --presets es2015,stage-0 --ignore src/client
+        
+    - script:
+        name: install
+        code: npm install --prefix src/client
     - script:
         name: copy
         code: cp -R /pipeline/source/. /public_chat

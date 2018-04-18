@@ -61,10 +61,12 @@ class SendForm extends Component {
     ev.preventDefault();
 
     let errors = {};
-    const re = /^[0-9a-zA-Z\u0400-\u04FF]+$/i;
+    /*
+    const re = /^[0-9 a-zA-Z\u0400-\u04FF]+$/i;
 
     if (this.state.text && !re.test(this.state.text))
       errors.text = 'Message may consists only letters and numbers';
+    */
 
     if (this.state.text && this.state.text.length > 200)
       errors.text = "Message can't be more than 200 letters";

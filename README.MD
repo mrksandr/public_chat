@@ -1,3 +1,5 @@
+[![wercker status](https://app.wercker.com/status/c0eaabc7e64a72cb9aa2fd5074b75224/s/master 'wercker status')](https://app.wercker.com/project/byKey/c0eaabc7e64a72cb9aa2fd5074b75224)
+
 ### Before launch install
 
 npm install - server<br>
